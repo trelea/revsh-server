@@ -14,6 +14,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 // connections without it are treated as UI clients.
 @WebSocketGateway({
   cors: { origin: '*' },
+  perMessageDeflate: false,
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -95,7 +96,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // ── Raw interactive input from the browser terminal → agent PTY stdin ───────
   // The UI sends every keystroke as-is; no newline is appended here.
   @SubscribeMessage('SH_INPUT')
-  handleShInput(_client: Socket, payload: { machine_id: string; data: string }) {
+  handleShInput(
+    _client: Socket,
+    payload: { machine_id: string; data: string },
+  ) {
     if (!payload?.machine_id || typeof payload.data !== 'string') return;
     this.emit__SH_INPUT__(payload.machine_id, payload.data);
   }
