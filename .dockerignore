@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+coverage/
+
+# Git
+.git/
+.gitignore
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Tests & tooling
+test/
+*.spec.ts
+*.e2e-spec.ts
+.eslint*
+.prettierrc
+eslint.config.mjs
+
+# Editors / AI assistants
+.vscode/
+.idea/
+.claude/
+.windsurf/
+.agents/
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Misc
+README.md
+skills-lock.json
+*.log
+npm-debug.log*
+yarn-error.log*
+.DS_Store

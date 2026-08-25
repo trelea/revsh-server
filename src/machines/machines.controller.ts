@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { InitMachineDto } from './dtos/main';
 import { MachinesService } from './machines.service';
-import { victim } from 'prisma/generated/client';
+import { victim } from '@prisma/client';
 
 @Controller('machines')
 export class MachinesController {

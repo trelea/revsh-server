@@ -6,7 +6,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { InitMachineDto } from './dtos/main';
 import { EventsGateway } from 'src/events/events.gateway';
-import { victim } from 'prisma/generated/client';
+import { victim } from '@prisma/client';
 
 @Injectable()
 export class MachinesService {
