@@ -32,10 +32,20 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     this.__REMOTE_MACHINES__.set(machine_id, client);
-    await this.prisma.victim.update({
-      where: { machine_id },
-      data: { state: 'Online', updated_at: new Date() },
-    });
+    // The victim is normally created by POST /api/v1/machines/init before the
+    // agent opens its socket. If that registration hasn't landed yet (race),
+    // gracefully skip the state update rather than throwing P2025.
+    try {
+      await this.prisma.victim.update({
+        where: { machine_id },
+        data: { state: 'Online', updated_at: new Date() },
+      });
+    } catch (error: any) {
+      if (error.code !== 'P2025') throw error;
+      console.warn(
+        `Socket connected for ${machine_id} but victim not registered yet`,
+      );
+    }
     this.server.emit('machine_state', { machine_id, state: 'Online' });
   }
 
@@ -50,10 +60,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // have reconnected before the server noticed the old connection drop.
     if (this.__REMOTE_MACHINES__.get(machine_id) === client) {
       this.__REMOTE_MACHINES__.delete(machine_id);
-      await this.prisma.victim.update({
-        where: { machine_id },
-        data: { state: 'Offline', updated_at: new Date() },
-      });
+      try {
+        await this.prisma.victim.update({
+          where: { machine_id },
+          data: { state: 'Offline', updated_at: new Date() },
+        });
+      } catch (error: any) {
+        if (error.code !== 'P2025') throw error;
+      }
       this.server.emit('machine_state', { machine_id, state: 'Offline' });
     }
   }
